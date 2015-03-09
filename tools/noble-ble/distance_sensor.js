@@ -26,16 +26,28 @@ var BTDevices = ["a4d856039ebf", "ee443390fa9d", "fb738cf43b8a"];
 
 var noble = require('noble');
 
+var mongo = require('mongoskin');
+var db = mongo.db("mongodb://localhost:27017/nodetest2", {native_parser:true});
+
+var found = 0;
+
 noble.on('discover', function(peripheral)
 {
-  for (var i = 0; i < BTDevices.length; i++) {
-    if(peripheral.uuid == BTDevices[i]){
-      //console.log('deviceData', {mac: peripheral.uuid, rssi:peripheral.rssi});
-      socket.emit('uuid', peripheral.uuid);
-      socket.emit('rssi', peripheral.rssi);
-      //console.log('bt distance ' + bt_distance(peripheral.rssi));
-    }
-  }
+    db.collection('userlist').find({username:peripheral.uuid}).toArray(function(err, results) {
+      if (results == '') {
+        //console.log('can not find');
+        return;
+      }
+      else {
+        if (found == 0) {
+        console.log(results);
+        console.log('kevin location is: ' + results[0].location);
+        socket.emit('uuid', peripheral.uuid);
+        socket.emit('rssi', peripheral.rssi);
+        found = 1;
+        }
+      }
+    });
 });
 
 //Math = require('mathjs');
