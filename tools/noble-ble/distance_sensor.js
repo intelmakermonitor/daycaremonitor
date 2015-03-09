@@ -11,7 +11,7 @@ var wait = 0;
 var echoPin = new m.Gpio(6); //setup digital read on pin 6
 echoPin.dir(m.DIR_IN); //set the gpio direction to input
 
-var trigPin = new m.Gpio(7); //setup digital read on pin 7
+var trigPin = new m.Gpio(4); //setup digital read on pin 4
 trigPin.dir(m.DIR_OUT); //set the gpio direction to output
 
 //replace localhost with your server's IP;

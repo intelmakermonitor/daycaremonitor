@@ -21,9 +21,9 @@ scanner.on('connection', function(socket) {
     
     socket.on('uuid', function(uuid) {
         console.log('uuid: ' + uuid);
-        bussPin.write(1); //set the digital pin high to light LED
-        sleep.usleep(500000);
-        bussPin.write(0); //set the digital pin to low
+//        bussPin.write(1); //set the digital pin high to light LED
+//        sleep.usleep(500000);
+//        bussPin.write(0); //set the digital pin to low
          var child = exec('node demo.js');
         //recived message from scanner
         //do some processing here
