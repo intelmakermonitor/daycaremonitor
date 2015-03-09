@@ -33,18 +33,20 @@ var found = 0;
 
 noble.on('discover', function(peripheral)
 {
-    db.collection('userlist').find({username:peripheral.uuid}).toArray(function(err, results) {
-      if (results == '') {
+    db.collection('userlist').findAndModify({username:peripheral.uuid}, [['username', 1]], {$set:{gender:'arrived'}}, {new:true}, 
+function(err, result) {
+      if (result == '') {
         //console.log('can not find');
         return;
-      }
-      else {
+      } else {
         if (found == 0) {
-        console.log(results);
-        console.log('kevin location is: ' + results[0].location);
-        socket.emit('uuid', peripheral.uuid);
-        socket.emit('rssi', peripheral.rssi);
-        found = 1;
+//          db.collection('userlist').update({username:peripheral.uuid}, {$set:{gender:'h'}});
+//          results.update({username:peripheral.uuid}, {$set:{gender:'h'}});
+          console.log(result);
+          console.log('kevin location is: ' + result.location);
+          socket.emit('uuid', peripheral.uuid);
+          socket.emit('rssi', peripheral.rssi);
+          found = 1;
         }
       }
     });
