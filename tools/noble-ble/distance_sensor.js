@@ -15,7 +15,7 @@ var trigPin = new m.Gpio(4); //setup digital read on pin 4
 trigPin.dir(m.DIR_OUT); //set the gpio direction to output
 
 //replace localhost with your server's IP;
-var socket = require('socket.io-client')('http://localhost:3000/scanner');
+var socket = require('socket.io-client')('http://localhost:6000/scanner');
 socket.on('connect', function()
 {
   console.log('connected to server');
