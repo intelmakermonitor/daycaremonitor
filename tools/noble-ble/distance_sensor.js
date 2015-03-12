@@ -31,25 +31,32 @@ var db = mongo.db("mongodb://localhost:27017/nodetest2", {native_parser:true});
 
 var found = 0;
 
+db.collection('userlist').insert({ "username" : "ee443390fa9d", "email" : "boy@testdomain.com" }, function(err, result) {});
+db.collection('userlist').insert({ "username" : "a4d856039ebf", "email" : "girl@testdomain.com" }, function(err, result) {});
+db.collection('userlist').insert({ "username" : "fb738cf43b8a", "email" : "teacher@testdomain.com" }, function(err, result) {});
+
 noble.on('discover', function(peripheral)
 {
-    db.collection('userlist').findAndModify({username:peripheral.uuid}, [['username', 1]], {$set:{gender:'arrived'}}, {new:true}, 
-function(err, result) {
-      if (result == '') {
-        //console.log('can not find');
-        return;
-      } else {
-        if (found == 0) {
-//          db.collection('userlist').update({username:peripheral.uuid}, {$set:{gender:'h'}});
-//          results.update({username:peripheral.uuid}, {$set:{gender:'h'}});
-          console.log(result);
-          console.log('kevin location is: ' + result.location);
-          socket.emit('uuid', peripheral.uuid);
-          socket.emit('rssi', peripheral.rssi);
-          found = 1;
+//    db.collection('userlist').insert({ "username" : peripheral.uuid, "email" : "testuser1@testdomain.com" },
+    db.collection('userlist').findAndModify(
+      {username:peripheral.uuid}, 
+      [['username', 1]],
+      {$set:{gender:'arrived'}}, 
+      {new:true}, 
+      function(err, result) {
+        if (err) {
+          console.log('can not find' + peripheral.uuid);
+        } else {
+          if (found == 0) {
+            console.log(result);
+            console.log('kevin location is: ' + result.location);
+            socket.emit('uuid', peripheral.uuid);
+            socket.emit('rssi', peripheral.rssi);
+            found = 1;
+          }
         }
       }
-    });
+    );
 });
 
 //Math = require('mathjs');
