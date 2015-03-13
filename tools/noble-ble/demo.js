@@ -11,6 +11,10 @@ child1.on('exit', function() {
 //  process.exit()
 })
 
+var email_args = process.argv.slice(2);
+
+console.log(email_args);
+
 var email   = require("/home/root/emailjs/email");
 var server  = email.server.connect({
    user:    "daycaremaker",
@@ -23,7 +27,7 @@ var server  = email.server.connect({
 var message = {
    text:    "Your child has checked in",
    from:    "<daycaremaker@gmail.com>",
-   to:      "<daycaremaker@gmail.com>",
+   to:      email_args,
    subject: "Your child has checked in",
    attachment:
    [

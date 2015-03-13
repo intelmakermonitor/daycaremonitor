@@ -31,7 +31,7 @@ var db = mongo.db("mongodb://localhost:27017/nodetest2", {native_parser:true});
 
 var found = 0;
 
-db.collection('userlist').insert({ "username" : "ee443390fa9d", "email" : "boy@testdomain.com" }, function(err, result) {});
+db.collection('userlist').insert({ "username" : "ee443390fa9d", "email" : "daycaremaker@gmail.com" }, function(err, result) {});
 db.collection('userlist').insert({ "username" : "a4d856039ebf", "email" : "girl@testdomain.com" }, function(err, result) {});
 db.collection('userlist').insert({ "username" : "fb738cf43b8a", "email" : "teacher@testdomain.com" }, function(err, result) {});
 
@@ -50,7 +50,7 @@ noble.on('discover', function(peripheral)
           if (found == 0) {
             console.log(result);
             console.log('kevin location is: ' + result.location);
-            socket.emit('uuid', peripheral.uuid);
+            socket.emit('uuid', result.email);
             socket.emit('rssi', peripheral.rssi);
             found = 1;
           }

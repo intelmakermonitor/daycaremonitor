@@ -24,7 +24,7 @@ scanner.on('connection', function(socket) {
 //        bussPin.write(1); //set the digital pin high to light LED
 //        sleep.usleep(500000);
 //        bussPin.write(0); //set the digital pin to low
-         var child = exec('node demo.js');
+         var child = exec('node demo.js ' + uuid);
         //recived message from scanner
         //do some processing here
     });
