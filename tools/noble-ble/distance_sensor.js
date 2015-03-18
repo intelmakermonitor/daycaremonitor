@@ -29,7 +29,9 @@ var noble = require('noble');
 var mongo = require('mongoskin');
 var db = mongo.db("mongodb://localhost:27017/nodetest2", {native_parser:true});
 
-var found = 0;
+var rssi_entry = 0;
+var rssi_exit = 0;
+var checkin = 0;
 
 db.collection('userlist').insert({ "username" : "ee443390fa9d", "email" : "daycaremaker@gmail.com" }, function(err, result) {});
 db.collection('userlist').insert({ "username" : "a4d856039ebf", "email" : "girl@testdomain.com" }, function(err, result) {});
@@ -38,25 +40,44 @@ db.collection('userlist').insert({ "username" : "fb738cf43b8a", "email" : "teach
 noble.on('discover', function(peripheral)
 {
 //    db.collection('userlist').insert({ "username" : peripheral.uuid, "email" : "testuser1@testdomain.com" },
-    db.collection('userlist').findAndModify(
-      {username:peripheral.uuid}, 
-      [['username', 1]],
-      {$set:{gender:'arrived'}}, 
-      {new:true}, 
-      function(err, result) {
-        if (err) {
-          console.log('can not find' + peripheral.uuid);
-        } else {
-          if (found == 0) {
+    if ((peripheral.rssi <= -70) && (rssi_entry == 0)) {
+      console.log('noise' + peripheral.rssi);
+      return;
+    }
+    else if ((peripheral.rssi > -70) && (rssi_entry == 0)) {
+      db.collection('userlist').findAndModify(
+        {username:peripheral.uuid}, 
+        [['username', 1]],
+        {$set:{gender:'arrived'}}, 
+        {new:true}, 
+        function(err, result) {
+          if (err) {
+            console.log('can not find' + peripheral.uuid);
+          } else {
+            console.log('entering entry door');
             console.log(result);
-            console.log('kevin location is: ' + result.location);
+            rssi_entry = 1;
+            rssi_exit = 0;
+            if (checkin == 0)
+              checkin = 1;
+            else
+              checkin = 0;
             socket.emit('uuid', result.email);
-            socket.emit('rssi', peripheral.rssi);
-            found = 1;
+            socket.emit('rssi', checkin);
+            console.log('checkin status ', + checkin);
           }
         }
-      }
-    );
+      );
+    }
+    else if ((rssi_entry == 1) && (peripheral.rssi <= -85)) {
+      console.log('leaving entry door' + peripheral.rssi);
+      rssi_exit = 1;
+      rssi_entry = 0;
+    }
+    else if ((rssi_entry == 1) && (peripheral.rssi > -85))
+      console.log('staying door' + peripheral.rssi);
+    else
+      console.log('should not be here ' + rssi_entry + rssi_exit);
 });
 
 //Math = require('mathjs');
@@ -81,11 +102,13 @@ function trigger_fire()
   detect_high();
   distance = pulsewidth_high();
 
+  console.log('distance ', + distance, 'rssi_entry ', + rssi_entry);
+
   // Todo tune the sonar sensor 
-  if (distance < 20) {
+  if ((distance < 20) || (rssi_entry == 1)) {
     noble.startScanning([], false); //do not allow dubplicates while scanning
   }
-  else {
+  else if (rssi_exit == 1) {
     noble.stopScanning();
   }
 
