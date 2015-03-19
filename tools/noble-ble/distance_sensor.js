@@ -1,3 +1,4 @@
+
 var sleep = require('sleep');
 var m = require('mraa'); //require mraa
 console.log('MRAA Version: ' + m.getVersion()); //write the mraa version to the console
@@ -13,6 +14,10 @@ echoPin.dir(m.DIR_IN); //set the gpio direction to input
 
 var trigPin = new m.Gpio(4); //setup digital read on pin 4
 trigPin.dir(m.DIR_OUT); //set the gpio direction to output
+
+var buzz = new m.Gpio(8); 
+buzz.dir(m.DIR_OUT); //set the gpio direction to output
+buzz.write(0);
 
 //replace localhost with your server's IP;
 var socket = require('socket.io-client')('http://localhost:6000/scanner');
@@ -52,9 +57,14 @@ noble.on('discover', function(peripheral)
         {new:true}, 
         function(err, result) {
           if (err) {
-            console.log('can not find' + peripheral.uuid);
+            console.log('err ' + err);
           } else {
             console.log('entering entry door');
+
+            // un-registered bt device 
+            if (result == null)
+               return;
+
             console.log(result);
             rssi_entry = 1;
             rssi_exit = 0;
@@ -64,7 +74,11 @@ noble.on('discover', function(peripheral)
               checkin = 0;
             socket.emit('uuid', result.email);
             socket.emit('rssi', checkin);
-            console.log('checkin status ', + checkin);
+            buzz.write(1);
+            sleep.usleep(1000);
+            buzz.write(0);
+            console.log('checkin status=', + checkin);
+            console.log('email=', + result.email);
           }
         }
       );
