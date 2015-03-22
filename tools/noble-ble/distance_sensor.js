@@ -45,11 +45,14 @@ db.collection('userlist').insert({ "username" : "fb738cf43b8a", "email" : "teach
 noble.on('discover', function(peripheral)
 {
 //    db.collection('userlist').insert({ "username" : peripheral.uuid, "email" : "testuser1@testdomain.com" },
-    if ((peripheral.rssi <= -70) && (rssi_entry == 0)) {
+    console.log('debug rssi ', + peripheral.rssi);
+    console.log('debug uuid ', + peripheral.uuid);
+
+    if ((peripheral.rssi <= -75) && (rssi_entry == 0)) {
       console.log('noise' + peripheral.rssi);
       return;
     }
-    else if ((peripheral.rssi > -70) && (rssi_entry == 0)) {
+    else if ((peripheral.rssi > -75) && (rssi_entry == 0)) {
       db.collection('userlist').findAndModify(
         {username:peripheral.uuid}, 
         [['username', 1]],
@@ -87,6 +90,9 @@ noble.on('discover', function(peripheral)
       console.log('leaving entry door' + peripheral.rssi);
       rssi_exit = 1;
       rssi_entry = 0;
+            buzz.write(1);
+            sleep.usleep(1000);
+            buzz.write(0);
     }
     else if ((rssi_entry == 1) && (peripheral.rssi > -85))
       console.log('staying door' + peripheral.rssi);
@@ -119,7 +125,7 @@ function trigger_fire()
   console.log('distance ', + distance, 'rssi_entry ', + rssi_entry);
 
   // Todo tune the sonar sensor 
-  if ((distance < 20) || (rssi_entry == 1)) {
+  if ((distance < 40) || (rssi_entry == 1)) {
     noble.startScanning([], false); //do not allow dubplicates while scanning
   }
   else if (rssi_exit == 1) {
