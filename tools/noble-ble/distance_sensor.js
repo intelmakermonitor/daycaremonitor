@@ -9,6 +9,9 @@ var count = 0;
 var detected = 0;
 var wait = 0;
 
+var pre_distance = 0;
+var cur_distance = 0;
+
 var echoPin = new m.Gpio(6); //setup digital read on pin 6
 echoPin.dir(m.DIR_IN); //set the gpio direction to input
 
@@ -27,7 +30,7 @@ socket.on('connect', function()
 });
 
 //add you bt mac here
-var BTDevices = ["a4d856039ebf", "ee443390fa9d", "fb738cf43b8a"];
+var BTDevices = ['ee443390fa9d', 'fb738cf43b8a'];
 
 var noble = require('noble');
 
@@ -36,23 +39,37 @@ var db = mongo.db("mongodb://localhost:27017/nodetest2", {native_parser:true});
 
 var rssi_entry = 0;
 var rssi_exit = 0;
-var checkin = 0;
+var checkin = 0;    
+var temp_uuid = '';
+
 
 db.collection('userlist').insert({ "username" : "ee443390fa9d", "email" : "daycaremaker@gmail.com" }, function(err, result) {});
-db.collection('userlist').insert({ "username" : "a4d856039ebf", "email" : "girl@testdomain.com" }, function(err, result) {});
 db.collection('userlist').insert({ "username" : "fb738cf43b8a", "email" : "teacher@testdomain.com" }, function(err, result) {});
 
 noble.on('discover', function(peripheral)
 {
-//    db.collection('userlist').insert({ "username" : peripheral.uuid, "email" : "testuser1@testdomain.com" },
-    console.log('debug rssi ', + peripheral.rssi);
-    console.log('debug uuid ', + peripheral.uuid);
+    if (peripheral.advertisement.localName != 'estimote') {
+      console.log('discard un-wanted device with local name: ' + peripheral.advertisement.localName);
+      return;
+    }
+
+    console.log('advertising the following service uuid\'s: ' + peripheral.uuid);
+
+//    peripheral.connect(function(error) {
+//      console.log('connected to peripheral: ' + peripheral.uuid);
+//      peripheral.discoverServices(BTDevices, function(error, services) {
+//        for (var i in services) {
+//          var deviceInformationService = services[i];
+//        }
+//      }
+//    }
 
     if ((peripheral.rssi <= -75) && (rssi_entry == 0)) {
       console.log('noise' + peripheral.rssi);
       return;
     }
     else if ((peripheral.rssi > -75) && (rssi_entry == 0)) {
+      temp_uuid = peripheral.uuid;
       db.collection('userlist').findAndModify(
         {username:peripheral.uuid}, 
         [['username', 1]],
@@ -62,42 +79,56 @@ noble.on('discover', function(peripheral)
           if (err) {
             console.log('err ' + err);
           } else {
-            console.log('entering entry door');
-
             // un-registered bt device 
-            if (result == null)
+            if (result == null){
+               console.log('uuid not registered in db');
                return;
+            }
+            if (pre_distance != cur_distance) {
+               console.log('moving target exit ', + cur_distance, + pre_distance);
+               return;
+            }
 
-            console.log(result);
+            console.log('entering entry door');
             rssi_entry = 1;
             rssi_exit = 0;
             if (checkin == 0)
-              checkin = 1;
+              checkin = temp_uuid;
             else
               checkin = 0;
+ 
             socket.emit('uuid', result.email);
             socket.emit('rssi', checkin);
+
+            console.log('check-in uuid ', + checkin);
+            //console.log('sending email ', + result.email);
+            console.log(result); 
+
+            // beep
             buzz.write(1);
             sleep.usleep(1000);
             buzz.write(0);
-            console.log('checkin status=', + checkin);
-            console.log('email=', + result.email);
           }
         }
       );
     }
     else if ((rssi_entry == 1) && (peripheral.rssi <= -85)) {
-      console.log('leaving entry door' + peripheral.rssi);
-      rssi_exit = 1;
-      rssi_entry = 0;
-            buzz.write(1);
-            sleep.usleep(1000);
-            buzz.write(0);
+      if (peripheral.uuid == checkin) {
+        console.log('leaving entry door' + peripheral.rssi);
+        rssi_exit = 1;
+        rssi_entry = 0;
+        buzz.write(1);
+        sleep.usleep(1000);
+        buzz.write(0);
+      }
+      else {
+        // another device show up, ignore now
+      }
     }
     else if ((rssi_entry == 1) && (peripheral.rssi > -85))
       console.log('staying door' + peripheral.rssi);
     else
-      console.log('should not be here ' + rssi_entry + rssi_exit);
+      console.log('should not be here ' + rssi_entry, + rssi_exit, + peripheral.uuid, + peripheral.rssi);
 });
 
 //Math = require('mathjs');
@@ -125,8 +156,21 @@ function trigger_fire()
   console.log('distance ', + distance, 'rssi_entry ', + rssi_entry);
 
   // Todo tune the sonar sensor 
-  if ((distance < 40) || (rssi_entry == 1)) {
-    noble.startScanning([], false); //do not allow dubplicates while scanning
+  if (distance < 40) {
+    noble.startScanning([], true); //do not allow dubplicates while scanning
+    pre_distance = cur_distance;
+    cur_distance = distance;
+  }
+  // assume pass the gate
+  else if (rssi_entry == 1) {
+    rssi_exit = 1;
+    rssi_entry = 0; 
+    noble.stopScanning();
+    console.log('sonar lost target, assume leaving');
+
+    buzz.write(1);
+    sleep.usleep(1000);
+    buzz.write(0);
   }
   else if (rssi_exit == 1) {
     noble.stopScanning();
