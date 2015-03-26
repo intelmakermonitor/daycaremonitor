@@ -6,7 +6,7 @@ socket.on('connect', function()
 });
 
 //add you bt mac here
-var BTDevices = ['ee443390fa9d', 'fb738cf43b8a'];
+var BTDevices = ['ee443390fa9d', 'fb738cf43b8a', 'db4d38b6ffb1'];
 
 var noble = require('noble');
 
@@ -18,8 +18,9 @@ var rssi_exit = 0;
 var checkin = 0;    
 var temp_uuid;
 
-db.collection('userlist').insert({ "username" : "ee443390fa9d", "email" : "LightBlue" }, function(err, result) {});
-db.collection('userlist').insert({ "username" : "fb738cf43b8a", "email" : "DeepBlue" }, function(err, result) {});
+db.collection('userlist').insert({ "username" : "ee443390fa9d", "email" : "LightBlue", "location" : "15122946365" }, function(err, result) {});
+db.collection('userlist').insert({ "username" : "fb738cf43b8a", "email" : "DeepBlue", "location" : "15122946365" }, function(err, result) {});
+db.collection('userlist').insert({ "username" : "db4d38b6ffb1", "email" : "LightGreen", "location" : "15122946365" }, function(err, result) {});
 
 noble.on('discover', function(peripheral)
 {
@@ -61,6 +62,7 @@ noble.on('discover', function(peripheral)
             }
 
             socket.emit('uuid', result.email);
+            socket.emit('phone_no', result.location);
             socket.emit('rssi', peripheral.rssi);
 
 //            console.log(result); 

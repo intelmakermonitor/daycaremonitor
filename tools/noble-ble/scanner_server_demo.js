@@ -7,6 +7,7 @@ var exec = require('exec-sync');
 
 var name;
 var status;
+var phone;
 var EXIT_GRACE_PERIOD = 10000; // milliseconds
 var inRange = [];
 
@@ -23,13 +24,18 @@ scanner.on('connection', function(socket) {
           inRange[uuid] = {
             lastSeen: Date.now()
           };
-          exec(['node email_demo.js ' +name +' ' +'Arrived']);
+          exec(['node email_demo.js ' +name +' ' +'Arrived' +' ' +phone]);
         }
 
         inRange[uuid].lastSeen = Date.now();
           
         console.log('uuid: ' + uuid);
     });
+
+    socket.on('phone_no', function(phone_no) { 
+        phone = phone_no; 
+        console.log('phone: ' + phone);
+    }); 
 
     socket.on('rssi', function(rssi) { 
         console.log('rssi: ' + rssi);
@@ -51,7 +57,7 @@ setInterval(function() {
     if (inRange[uuid].lastSeen < (Date.now() - EXIT_GRACE_PERIOD)) {
 
       console.log(+ uuid + 'exited  ' + new Date());
-      exec(['node email_demo.js ' +uuid +' ' +'Left']);
+      exec(['node email_demo.js ' +uuid +' ' +'Left' +' ' +phone]);
       delete inRange[uuid];
     }
   }
