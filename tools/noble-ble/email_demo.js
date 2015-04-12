@@ -3,7 +3,7 @@ var status = process.argv.slice(2);
  
 console.log(status);
  
-var email   = require("/home/root/emailjs/email");
+var email   = require("/usr/lib/node_modules/emailjs/email");
 var server  = email.server.connect({
    user:    "daycaremaker",
    password:"Intel123",
