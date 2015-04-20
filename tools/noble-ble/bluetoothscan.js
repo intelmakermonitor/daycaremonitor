@@ -25,11 +25,11 @@ db.collection('userlist').insert({ "username" : "db4d38b6ffb1", "email" : "Light
 noble.on('discover', function(peripheral)
 {
     if (peripheral.advertisement.localName != 'estimote') {
-      console.log('discard un-wanted device with local name: ' + peripheral.advertisement.localName);
+//      console.log('discard un-wanted device with local name: ' + peripheral.advertisement.localName);
       return;
     }
 
-    console.log('advertising the following service uuid\'s: ' + peripheral.uuid);
+//    console.log('advertising the following service uuid\'s: ' + peripheral.uuid);
 
 //    peripheral.connect(function(error) {
 //      console.log('connected to peripheral: ' + peripheral.uuid);
@@ -41,7 +41,7 @@ noble.on('discover', function(peripheral)
 //    }
 
     if (peripheral.rssi <= -85) {
-      console.log('noise' + peripheral.rssi);
+//    console.log('noise' + peripheral.rssi);
       return;
     }
     else {
