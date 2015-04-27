@@ -56,7 +56,7 @@ setInterval(function() {
   for (var uuid in inRange) {
     if (inRange[uuid].lastSeen < (Date.now() - EXIT_GRACE_PERIOD)) {
 
-      console.log(+ uuid + 'exited  ' + new Date());
+      console.log('uuid: ' +uuid +' exited ' +new Date());
       exec(['node email_demo.js ' +uuid +' ' +'Left' +' ' +phone]);
       delete inRange[uuid];
     }
