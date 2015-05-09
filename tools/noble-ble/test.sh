@@ -1,4 +1,4 @@
-cp *.* ~/node-ex/node-tutorial-2-restful-app
+cp *.js ~/node-ex/node-tutorial-2-restful-app
 cd /home/root/node-ex/node-tutorial-2-restful-app
 rm -rf /home/root/node-ex/node-tutorial-2-restful-app/data/
 mkdir -p /home/root/node-ex/node-tutorial-2-restful-app/data

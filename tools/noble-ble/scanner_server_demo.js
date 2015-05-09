@@ -4,6 +4,8 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);  
 var scanner = io.of('/scanner'); 
 var exec = require('exec-sync');
+var mongo = require('mongoskin');
+var db = mongo.db("mongodb://localhost:27017/nodetest2", {native_parser:true});
 
 var name;
 var status;
@@ -58,6 +60,14 @@ setInterval(function() {
 
       console.log('uuid: ' +uuid +' exited ' +new Date());
       exec(['node email_demo.js ' +uuid +' ' +'Left' +' ' +phone]);
+      db.collection('userlist').findAndModify(
+        {childname:uuid}, 
+        [['childname', 1]],
+        {$set:{status:'off site'}}, 
+        {new:true}, 
+        function(err, result) {}
+      );
+
       delete inRange[uuid];
     }
   }

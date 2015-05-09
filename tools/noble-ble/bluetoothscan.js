@@ -18,9 +18,12 @@ var rssi_exit = 0;
 var checkin = 0;    
 var temp_uuid;
 
-db.collection('userlist').insert({ "username" : "ee443390fa9d", "email" : "LightBlue", "location" : "15122946365" }, function(err, result) {});
-db.collection('userlist').insert({ "username" : "fb738cf43b8a", "email" : "DeepBlue", "location" : "15122946365" }, function(err, result) {});
-db.collection('userlist').insert({ "username" : "db4d38b6ffb1", "email" : "LightGreen", "location" : "15122946365" }, function(err, result) {});
+db.collection('userlist').insert({ "childid" : "ee443390fa9d", "childname" : "LightBlue", "parentphone" : "15122946365", "email" : "daycaremaker@gmail.com", "age" : "5", "parentname" : 
+"Light Blue Dad", "gender" : "male", "status" : "off site"}, function(err, result) {});
+db.collection('userlist').insert({ "childid" : "fb738cf43b8a", "childname" : "DeepBlue", "parentphone" : "15122946365", "email" : "daycaremaker@gmail.com", "age" : "6", "parentname" :    
+"Deep Blue Dad", "gender" : "male", "status" : "off site"}, function(err, result) {});
+db.collection('userlist').insert({ "childid" : "db4d38b6ffb1", "childname" : "LightGreen", "parentphone" : "15122946365", "email" : "daycaremaker@gmail.com", "age" : "4", "parentname" :    
+"Light Green Mom", "gender" : "female", "status" : "off site"}, function(err, result) {});
 
 noble.on('discover', function(peripheral)
 {
@@ -47,9 +50,9 @@ noble.on('discover', function(peripheral)
     else {
       temp_uuid = peripheral.uuid;
       db.collection('userlist').findAndModify(
-        {username:peripheral.uuid}, 
-        [['username', 1]],
-        {$set:{gender:'arrived'}}, 
+        {childid:peripheral.uuid}, 
+        [['childid', 1]],
+        {$set:{status:'arrived'}}, 
         {new:true}, 
         function(err, result) {
           if (err) {
@@ -61,8 +64,8 @@ noble.on('discover', function(peripheral)
                return;
             }
 
-            socket.emit('uuid', result.email);
-            socket.emit('phone_no', result.location);
+            socket.emit('uuid', result.childname);
+            socket.emit('phone_no', result.parentphone);
             socket.emit('rssi', peripheral.rssi);
 
 //            console.log(result); 
