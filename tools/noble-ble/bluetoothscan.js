@@ -6,7 +6,7 @@ socket.on('connect', function()
 });
 
 //add you bt mac here
-var BTDevices = ['ee443390fa9d', 'fb738cf43b8a', 'db4d38b6ffb1'];
+var BTDevices = ['<CHILD 1 BLE ID>', '<CHILD 2 BLE ID>'];
 
 var noble = require('noble');
 
@@ -18,33 +18,19 @@ var rssi_exit = 0;
 var checkin = 0;    
 var temp_uuid;
 
-db.collection('userlist').insert({ "childid" : "ee443390fa9d", "childname" : "LightBlue", "parentphone" : "15122946365", "email" : "daycaremaker@gmail.com", "age" : "5", "parentname" : 
-"Light Blue Dad", "gender" : "male", "status" : "off site"}, function(err, result) {});
-db.collection('userlist').insert({ "childid" : "fb738cf43b8a", "childname" : "DeepBlue", "parentphone" : "15122946365", "email" : "daycaremaker@gmail.com", "age" : "6", "parentname" :    
-"Deep Blue Dad", "gender" : "male", "status" : "off site"}, function(err, result) {});
-db.collection('userlist').insert({ "childid" : "db4d38b6ffb1", "childname" : "LightGreen", "parentphone" : "15122946365", "email" : "daycaremaker@gmail.com", "age" : "4", "parentname" :    
-"Light Green Mom", "gender" : "female", "status" : "off site"}, function(err, result) {});
+db.collection('userlist').insert({ "childid" : "<CHILD 1 BLE ID>", "childname" : "<CHILD 1 NAME>", "parentphone" : "0123456789", "email" : "<CHILD 1 PARENT EMAIL>", "age" : "<CHILD 1 AGE>", "parentname" : 
+"CHILD 1 PARENT NAME", "gender" : "<CHILD 1 GENDER>", "status" : "off site"}, function(err, result) {});
+
+db.collection('userlist').insert({ "childid" : "<CHILD 2 BLE ID>", "childname" : "<CHILD 2 NAME>", "parentphone" : "0123456789", "email" : "<CHILD 2 PARENT EMAIL>", "age" : "<CHILD 2 AGE>", "parentname" : 
+"CHILD 2 PARENT NAME", "gender" : "<CHILD 2 GENDER>", "status" : "off site"}, function(err, result) {});
 
 noble.on('discover', function(peripheral)
 {
     if (peripheral.advertisement.localName != 'estimote') {
-//      console.log('discard un-wanted device with local name: ' + peripheral.advertisement.localName);
       return;
     }
 
-//    console.log('advertising the following service uuid\'s: ' + peripheral.uuid);
-
-//    peripheral.connect(function(error) {
-//      console.log('connected to peripheral: ' + peripheral.uuid);
-//      peripheral.discoverServices(BTDevices, function(error, services) {
-//        for (var i in services) {
-//          var deviceInformationService = services[i];
-//        }
-//      }
-//    }
-
     if (peripheral.rssi <= -85) {
-//    console.log('noise' + peripheral.rssi);
       return;
     }
     else {
@@ -67,9 +53,6 @@ noble.on('discover', function(peripheral)
             socket.emit('uuid', result.childname);
             socket.emit('phone_no', result.parentphone);
             socket.emit('rssi', peripheral.rssi);
-
-//            console.log(result); 
-
           }
         }
       );
@@ -77,4 +60,3 @@ noble.on('discover', function(peripheral)
 });
 
 noble.startScanning([], true);
-
