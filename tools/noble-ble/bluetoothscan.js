@@ -6,7 +6,7 @@ socket.on('connect', function()
 });
 
 //add you bt mac here
-var BTDevices = ['<CHILD 1 BLE ID>', '<CHILD 2 BLE ID>'];
+var BTDevices = ['ee443390fa9d'];
 
 var noble = require('noble');
 
@@ -18,11 +18,9 @@ var rssi_exit = 0;
 var checkin = 0;    
 var temp_uuid;
 
-db.collection('userlist').insert({ "childid" : "<CHILD 1 BLE ID>", "childname" : "<CHILD 1 NAME>", "parentphone" : "0123456789", "email" : "<CHILD 1 PARENT EMAIL>", "age" : "<CHILD 1 AGE>", "parentname" : 
-"CHILD 1 PARENT NAME", "gender" : "<CHILD 1 GENDER>", "status" : "off site"}, function(err, result) {});
+db.collection('userlist').insert({ "childid" : "ee443390fa9d", "childname" : "danny", "parentphone" : "0123456789", "email" : "daycaremaker@gmail.com", "age" : "5", "parentname" : 
+"danny's mom", "gender" : "male", "status" : "off site"}, function(err, result) {});
 
-db.collection('userlist').insert({ "childid" : "<CHILD 2 BLE ID>", "childname" : "<CHILD 2 NAME>", "parentphone" : "0123456789", "email" : "<CHILD 2 PARENT EMAIL>", "age" : "<CHILD 2 AGE>", "parentname" : 
-"CHILD 2 PARENT NAME", "gender" : "<CHILD 2 GENDER>", "status" : "off site"}, function(err, result) {});
 
 noble.on('discover', function(peripheral)
 {
